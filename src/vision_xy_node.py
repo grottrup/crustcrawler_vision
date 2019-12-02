@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from crustcrawler_vision.msg import BrickArray, Brick
-import vision_utilitites as vision
+#import vision_utilitites as vision
 
 class VisionNodeXY():
 	def __init__(self):
