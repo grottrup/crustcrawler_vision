@@ -1,19 +1,21 @@
-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 '''
 '''
 
 import cv2
 import numpy as np
-import urllib
+import imageio
 
 '''
 https://github.com/alexleavitt/uscplayspokemon/blob/master/tommycam.py
 '''
 def get_video_capture_frame(video_capture_url_jpg_str):
-    img_request = urllib.request.urlopen(video_capture_url_jpg_str)
-    img_arr = np.asarray(bytearray(img_request.read()), dtype=np.uint8)   
-    original_frame = cv2.imdecode(img_arr,-1)
-    return original_frame
+    img_request = imageio.imread('http://192.168.1.103/image.jpg')[:,:,::-1] #JPG to BGR
+    if (img_request is None) or (not img_request.shape):
+        print('No image')
+        return None
+    return img_request
 
 '''
 https://docs.opencv.org/master/d7/d4d/tutorial_py_thresholding.html
@@ -102,5 +104,6 @@ while True:
     #img2 = get_video_capture_frame(dlink_video_jpg_url2)
     #cv2.imshow('vid2', img2)
     if cv2.waitKey(1) != -1:
+        cv2.destroyAllWindows()
         break
     
