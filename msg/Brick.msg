@@ -1,6 +1,3 @@
-string color
-uint8 xPos
-uint8 yPos
-uint16 width
-uint16 height
-uint8 angle
+uint32 x_center
+uint32 y_center
+uint32 pixel_areal

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 '''
@@ -11,11 +11,11 @@ import imageio
 https://github.com/alexleavitt/uscplayspokemon/blob/master/tommycam.py
 '''
 def get_video_capture_frame(video_capture_url_jpg_str):
-    img_request = imageio.imread('http://192.168.1.103/image.jpg')[:,:,::-1] #JPG to BGR
+    img_request = imageio.imread(video_capture_url_jpg_str)[:,:,::-1] #JPG to BGR
     if (img_request is None) or (not img_request.shape):
         print('No image')
-        return None
-    return img_request
+        return False, None
+    return True, img_request
 
 '''
 https://docs.opencv.org/master/d7/d4d/tutorial_py_thresholding.html
@@ -42,68 +42,95 @@ def remove_noise(img_frame):
     result = cv2.bilateralFilter(result,3,16,16)
     return result
 
+
+def filter_max_rgb(img_frame):
+    (B, G, R) = cv2.split(img_frame)
+    M = np.maximum(np.maximum(R, G), B)
+    R[R < M] = 0
+    G[G < M] = 0
+    B[B < M] = 0
+    result = cv2.merge([B, G, R])
+    return result
 '''
 https://docs.opencv.org/master/df/d9d/tutorial_py_colorspaces.html
 https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape????
 '''
 def blue_color_mask(img_frame):
-    result = img_frame   
-    
-    result = cv2.convertScaleAbs(result, alpha=1.95, beta=0)
-    
+    result = img_frame       
+#    result = cv2.convertScaleAbs(result, alpha=1.95, beta=0) 
     result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
-    lower_blue = np.array([70,70,80])
+    lower_blue = np.array([50,50,80])
     upper_blue = np.array([140,255,255])
     result = cv2.inRange(result, lower_blue, upper_blue)
+
+    ret, result = cv2.threshold(result, 50, 255, cv2.THRESH_BINARY)
     return result
 
 def filter_blue_bricks(img_frame):
-    result = img_frame
-    # result = remove_noise(result)
-    result = blue_color_mask(result)
-    result = fint_brick_center(result) 
-    return result
+    frame = img_frame
+    frame = blue_color_mask(frame)
+    frame = remove_noise(frame)
+    blue_brick_arr = find_brick_centers(frame) 
+    return blue_brick_arr
 
 def filter_red_bricks(img_frame):
     result = img_frame
     # result = filter_excess_red_frame(img_frame)
     result = threshold_frame(result, 200)
     #result = remove_noise(result)
-    result = fint_brick_center(result)    
+    result = find_brick_centers(result)    
     return result
 
-def fint_brick_center(img_frame):
-    result = img_frame
-    contours, hierarchy = cv2.findContours(result.astype('uint8'), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for brick in contours:
-        areal = cv2.contourArea(brick)
-        if(areal > 1500):
-            M = cv2.moments(brick)
-            cx = int(M['m10']/M['m00'])
-            cy = int(M['m01']/M['m00'])
-            result = cv2.circle(result,(cx, cy),10,(0,255,0))
-        elif(areal > 600):
-            M = cv2.moments(brick)
-            cx = int(M['m10']/M['m00'])
-            cy = int(M['m01']/M['m00'])
-            result = cv2.circle(result,(cx, cy),5,(0,255,0))
-    return result
-    
-while True:
-    dlink_video_jpg_url = 'http://192.168.0.20/image.jpg'
-    dlink_video_jpg_url2 = 'http://192.168.0.21/image.jpg'
-    img = get_video_capture_frame(dlink_video_jpg_url)
-    cropped_img = img[42:img.shape[0]-80, 0:img.shape[1]] # crop so it only shows table
-    
-    blue_bricks = filter_blue_bricks(cropped_img)
-    cv2.imshow('blue', blue_bricks)       
-    
-    # red_bricks = filter_red_bricks(cropped_img)
-    # cv2.imshow('red', red_bricks)
-    
-    #img2 = get_video_capture_frame(dlink_video_jpg_url2)
-    #cv2.imshow('vid2', img2)
-    if cv2.waitKey(1) != -1:
-        cv2.destroyAllWindows()
-        break
-    
+
+class Brick:
+    x_center = 0
+    y_center = 0
+    pixel_areal = 0
+
+def find_brick_centers(img_frame):
+    frame = img_frame
+    contours, hierarchy = cv2.findContours(frame.astype('uint8'), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    brick_arr = []
+    for contour in contours:
+        pixel_areal = cv2.contourArea(contour)
+        if(pixel_areal > 1500):
+            brick = Brick()
+            brick.pixel_areal = pixel_areal
+            M = cv2.moments(contour)
+            brick.x_center = int(M['m10']/M['m00'])
+            brick.y_center = int(M['m01']/M['m00'])
+            brick_arr.append(brick)
+            # frame = cv2.circle(frame,(cx, cy),10,(0,255,0))
+            # cv2.imshow('blue', frame)
+        elif(pixel_areal > 600):
+            brick = Brick()
+            brick.pixel_areal = pixel_areal
+            M = cv2.moments(contour)
+            brick.x_center = int(M['m10']/M['m00'])
+            brick.y_center = int(M['m01']/M['m00'])
+            brick_arr.append(brick)
+            #result = cv2.circle(result,(cx, cy),5,(0,255,0))
+    return brick_arr
+
+#while True:
+#    dlink_video_jpg_url = 'http://192.168.0.20/image.jpg'
+#    dlink_video_jpg_url2 = 'http://192.168.0.21/image.jpg'
+#    img = get_video_capture_frame(dlink_video_jpg_url)
+#    cropped_img = img[42:img.shape[0]-80, 0:img.shape[1]] # crop so it only shows table
+#    
+#    filter_max_rgb
+#    blue_bricks = filter_blue_bricks(cropped_img)
+#    cv2.imshow('blue', blue_bricks)
+##    blue_bricks = filter_blue_bricks(cropped_img)
+##    cv2.imshow('blue', blue_bricks)       
+#    
+#    # red_bricks = filter_red_bricks(cropped_img)
+#    # cv2.imshow('red', red_bricks)
+#    
+#    #img2 = get_video_capture_frame(dlink_video_jpg_url2)
+#    #cv2.imshow('vid2', img2)
+#    if cv2.waitKey(1) != -1:
+#        cv2.destroyAllWindows()
+#        break
+#    
