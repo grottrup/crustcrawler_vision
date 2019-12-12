@@ -50,6 +50,8 @@ add_message_files(
   FILES
   Brick.msg
   BrickArray.msg
+  TrackedObject.msg
+  TrackedObjectArray.msg
 )
 
 ## Generate services in the 'srv' folder

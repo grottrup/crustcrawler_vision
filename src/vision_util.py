@@ -85,7 +85,9 @@ def filter_red_bricks(img_frame):
 class Brick:
     x_center = 0
     y_center = 0
-    pixel_areal = 0
+    pixel_width = 0
+    pixel_height = 0
+    rotation_degrees = 0
 
 def find_brick_centers(img_frame):
     frame = img_frame
@@ -96,16 +98,23 @@ def find_brick_centers(img_frame):
         pixel_areal = cv2.contourArea(contour)
         if(pixel_areal > 1500):
             brick = Brick()
-            brick.pixel_areal = pixel_areal
             M = cv2.moments(contour)
             brick.x_center = int(M['m10']/M['m00'])
             brick.y_center = int(M['m01']/M['m00'])
+            rectangle_w_rotation = cv2.minAreaRect(contour)
+            brick.pixel_width = rectangle_w_rotation[1][0]
+            brick.pixel_height = rectangle_w_rotation[1][1]
+            brick.rotation_degrees = rectangle_w_rotation[2]
+            #box_points = cv2.cv.BoxPoints(rectangle_w_rotation)
+            print(rectangle_w_rotation)
+            print(brick.rotation_degrees)
+            print(brick.pixel_width)
+            print(brick.pixel_height)
             brick_arr.append(brick)
             # frame = cv2.circle(frame,(cx, cy),10,(0,255,0))
             # cv2.imshow('blue', frame)
         elif(pixel_areal > 600):
             brick = Brick()
-            brick.pixel_areal = pixel_areal
             M = cv2.moments(contour)
             brick.x_center = int(M['m10']/M['m00'])
             brick.y_center = int(M['m01']/M['m00'])

@@ -33,10 +33,13 @@ Add messages, update package.xml and CMakeList.txt to have the needed dependenci
 ```
 ip addr show
 
-~/catkin_ws/src/crustcrawler_vision/src$ source ~/catkin_ws/devel/setup.bash
 
 export ROS_IP=192.168.1.102   # your IP
-export ROS_MASTER_URI=http://192.168.1.105:11311 # the master ip
+export ROS_MASTER_URI=http://192.168.1.102:11311 # the master ip
 
+~/catkin_ws/src/crustcrawler_vision/src$ source ~/catkin_ws/devel/setup.bash
 ~/catkin_ws/src/crustcrawler_vision/src$ rosrun crustcrawler_vision vision_node.py
+
+~/catkin_ws/src/crustcrawler_vision/src$ source ~/catkin_ws/devel/setup.bash
+~/catkin_ws/src/crustcrawler_vision/src$ rosrun crustcrawler_vision object_tracking_node.py
 ```
