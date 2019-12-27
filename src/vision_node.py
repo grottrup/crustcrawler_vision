@@ -6,12 +6,12 @@ import vision_util as vision
 class VisionNode():
     def __init__(self):
         self.publisher = rospy.Publisher("/vision_topic", BrickArray, queue_size=1)
-        self.timer = rospy.Timer(rospy.Duration(1.1), self.onTimer)
+        self.timer = rospy.Timer(rospy.Duration(10.0), self.onTimer)
         print('Starting Vision Node...')
 
 
     def onTimer(self, event):
-        ret, frame = vision.get_video_capture_frame('http://192.168.1.101/image.jpg')
+        ret, frame = vision.get_video_capture_frame('http://192.168.1.103/image.jpg')
         if ret:
             #print('image :)')
             #print(frame.shape)
@@ -24,6 +24,7 @@ class VisionNode():
                 brick = Brick()
                 brick.x_center = contour.x_center
                 brick.y_center = contour.y_center
+                brick.rotation_degrees = contour.rotation_degrees
                 data.blue_bricks.append(brick)
             msg = data
             self.publisher.publish(msg)

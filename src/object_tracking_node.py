@@ -33,7 +33,8 @@ class Object_tracking_node():
 		out_msg = TrackedObjectArray()
 		blue_bricks = in_msg.blue_bricks
 		for brick in blue_bricks:
-			print('x center: ', brick.x_center, 'y center: ', brick.y_center, 'areal: ', brick.pixel_areal)	
+			#print('x center: ', brick.x_center, 'y center: ', brick.y_center)	
+			print('rot: ', brick.rotation_degrees)	
 			data = TrackedObject()
 			data.x_center = 10
 			data.y_center = 20

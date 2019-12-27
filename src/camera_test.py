@@ -3,7 +3,7 @@ import cv2
 import imageio
 
 
-im = imageio.imread('http://192.168.1.103/image.jpg')[:,:,::-1] #JPG to BGR
+im = imageio.imread('http://192.168.1.102/image.jpg')[:,:,::-1] #JPG to BGR
 
 frame = im
 
