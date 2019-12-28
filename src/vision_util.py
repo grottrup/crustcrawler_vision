@@ -14,8 +14,6 @@ class Brick:
     pixel_height = 0
     rotation_degrees = 0.0
     
-class Crustcrawler:
-    base_pixel_width = 0
 '''
 https://github.com/alexleavitt/uscplayspokemon/blob/master/tommycam.py
 '''
