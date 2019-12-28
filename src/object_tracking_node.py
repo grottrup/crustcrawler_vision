@@ -4,7 +4,9 @@ from crustcrawler_vision.msg import TrackedObject, TrackedObjectArray
 from crustcrawler_vision.msg import Brick, BrickArray #temp
 import message_filters
 
-class Object_tracking_node():
+class ObjectTrackingNode():
+    crustcrawler_base_width_cm = 11.5
+
 	def __init__(self):
 		#xy_sub = message_filters.Subscriber("/img_xy", Image_brick_data_array)
 		#xz_sub = message_filters.Subscriber("/img_xz", Image_brick_data_array)

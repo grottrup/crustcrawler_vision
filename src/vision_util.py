@@ -7,6 +7,15 @@ import cv2
 import numpy as np
 import imageio
 
+class Brick:
+    x_center = 0
+    y_center = 0
+    pixel_width = 0
+    pixel_height = 0
+    rotation_degrees = 0.0
+    
+class Crustcrawler:
+    base_pixel_width = 0
 '''
 https://github.com/alexleavitt/uscplayspokemon/blob/master/tommycam.py
 '''
@@ -81,14 +90,6 @@ def filter_red_bricks(img_frame):
     result = find_brick_centers(result)    
     return result
 
-
-class Brick:
-    x_center = 0
-    y_center = 0
-    pixel_width = 0
-    pixel_height = 0
-    rotation_degrees = 0
-
 def find_brick_centers(img_frame):
     frame = img_frame
     contours, hierarchy = cv2.findContours(frame.astype('uint8'), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -106,10 +107,10 @@ def find_brick_centers(img_frame):
             brick.pixel_height = rectangle_w_rotation[1][1]
             brick.rotation_degrees = rectangle_w_rotation[2]
             #box_points = cv2.cv.BoxPoints(rectangle_w_rotation)
-            print(rectangle_w_rotation)
+            #print(rectangle_w_rotation)
             print(brick.rotation_degrees)
-            print(brick.pixel_width)
-            print(brick.pixel_height)
+            #print(brick.pixel_width)
+            #print(brick.pixel_height)
             brick_arr.append(brick)
             # frame = cv2.circle(frame,(cx, cy),10,(0,255,0))
             # cv2.imshow('blue', frame)
@@ -121,25 +122,3 @@ def find_brick_centers(img_frame):
             brick_arr.append(brick)
             #result = cv2.circle(result,(cx, cy),5,(0,255,0))
     return brick_arr
-
-#while True:
-#    dlink_video_jpg_url = 'http://192.168.0.20/image.jpg'
-#    dlink_video_jpg_url2 = 'http://192.168.0.21/image.jpg'
-#    img = get_video_capture_frame(dlink_video_jpg_url)
-#    cropped_img = img[42:img.shape[0]-80, 0:img.shape[1]] # crop so it only shows table
-#    
-#    filter_max_rgb
-#    blue_bricks = filter_blue_bricks(cropped_img)
-#    cv2.imshow('blue', blue_bricks)
-##    blue_bricks = filter_blue_bricks(cropped_img)
-##    cv2.imshow('blue', blue_bricks)       
-#    
-#    # red_bricks = filter_red_bricks(cropped_img)
-#    # cv2.imshow('red', red_bricks)
-#    
-#    #img2 = get_video_capture_frame(dlink_video_jpg_url2)
-#    #cv2.imshow('vid2', img2)
-#    if cv2.waitKey(1) != -1:
-#        cv2.destroyAllWindows()
-#        break
-#    
