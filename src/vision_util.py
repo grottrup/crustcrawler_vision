@@ -49,22 +49,12 @@ def remove_noise(img_frame):
     result = cv2.bilateralFilter(result,3,16,16)
     return result
 
-
-def filter_max_rgb(img_frame):
-    (B, G, R) = cv2.split(img_frame)
-    M = np.maximum(np.maximum(R, G), B)
-    R[R < M] = 0
-    G[G < M] = 0
-    B[B < M] = 0
-    result = cv2.merge([B, G, R])
-    return result
 '''
 https://docs.opencv.org/master/df/d9d/tutorial_py_colorspaces.html
 https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape????
 '''
 def blue_color_mask(img_frame):
-    result = img_frame       
-#    result = cv2.convertScaleAbs(result, alpha=1.95, beta=0) 
+    result = img_frame
     result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
     lower_blue = np.array([50,50,80])
     upper_blue = np.array([140,255,255])
@@ -73,29 +63,46 @@ def blue_color_mask(img_frame):
     ret, result = cv2.threshold(result, 50, 255, cv2.THRESH_BINARY)
     return result
 
+def red_color_mask(img_frame):
+    result = img_frame
+    result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
+    lower_red = np.array([140,100,0])
+    upper_red = np.array([255,255,255])
+    result = cv2.inRange(result, lower_red, upper_red)
+
+    ret, result = cv2.threshold(result, 50, 255, cv2.THRESH_BINARY)
+    return result
+
 def filter_blue_bricks(img_frame):
     frame = img_frame
     frame = blue_color_mask(frame)
     frame = remove_noise(frame)
-    blue_brick_arr = find_brick_centers(frame) 
+    blue_brick_arr = find_bricks(frame) 
     return blue_brick_arr
 
 def filter_red_bricks(img_frame):
-    result = img_frame
-    # result = filter_excess_red_frame(img_frame)
-    result = threshold_frame(result, 200)
-    #result = remove_noise(result)
-    result = find_brick_centers(result)    
-    return result
+    frame = img_frame
+    frame = red_color_mask(frame)
+    frame = remove_noise(frame)
+    red_brick_arr = find_bricks(frame) 
+    return red_brick_arr
 
-def find_brick_centers(img_frame):
+def init_get_ref_pixel_width(img_frame):
+    bricks = filter_blue_bricks(img_frame)
+    if len(bricks) is 1:
+        print('count 1')
+        calibration_brick_pixel_width = bricks[0].pixel_width
+        return calibration_brick_pixel_width
+    return 0
+
+def find_bricks(img_frame):
     frame = img_frame
     contours, hierarchy = cv2.findContours(frame.astype('uint8'), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     brick_arr = []
     for contour in contours:
         pixel_areal = cv2.contourArea(contour)
-        if(pixel_areal > 1500):
+        if(pixel_areal > 600):
             brick = Brick()
             M = cv2.moments(contour)
             brick.x_center = int(M['m10']/M['m00'])
@@ -104,19 +111,6 @@ def find_brick_centers(img_frame):
             brick.pixel_width = rectangle_w_rotation[1][0]
             brick.pixel_height = rectangle_w_rotation[1][1]
             brick.rotation_degrees = rectangle_w_rotation[2]
-            #box_points = cv2.cv.BoxPoints(rectangle_w_rotation)
-            #print(rectangle_w_rotation)
-            print(brick.rotation_degrees)
-            #print(brick.pixel_width)
-            #print(brick.pixel_height)
+            print("{}".format(brick.rotation_degrees))
             brick_arr.append(brick)
-            # frame = cv2.circle(frame,(cx, cy),10,(0,255,0))
-            # cv2.imshow('blue', frame)
-        elif(pixel_areal > 600):
-            brick = Brick()
-            M = cv2.moments(contour)
-            brick.x_center = int(M['m10']/M['m00'])
-            brick.y_center = int(M['m01']/M['m00'])
-            brick_arr.append(brick)
-            #result = cv2.circle(result,(cx, cy),5,(0,255,0))
     return brick_arr
