@@ -1,3 +1,2 @@
 Brick[] blue_bricks
 Brick[] red_bricks
-uint32 ref_pixel_width

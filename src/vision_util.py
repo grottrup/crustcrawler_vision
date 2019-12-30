@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-'''
 
 import cv2
 import numpy as np
@@ -66,7 +64,7 @@ def blue_color_mask(img_frame):
 def red_color_mask(img_frame):
     result = img_frame
     result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
-    lower_red = np.array([140,100,0])
+    lower_red = np.array([145,145,0])
     upper_red = np.array([255,255,255])
     result = cv2.inRange(result, lower_red, upper_red)
 
@@ -90,7 +88,6 @@ def filter_red_bricks(img_frame):
 def init_get_ref_pixel_width(img_frame):
     bricks = filter_blue_bricks(img_frame)
     if len(bricks) is 1:
-        print('count 1')
         calibration_brick_pixel_width = bricks[0].pixel_width
         return calibration_brick_pixel_width
     return 0
@@ -111,6 +108,5 @@ def find_bricks(img_frame):
             brick.pixel_width = rectangle_w_rotation[1][0]
             brick.pixel_height = rectangle_w_rotation[1][1]
             brick.rotation_degrees = rectangle_w_rotation[2]
-            print("{}".format(brick.rotation_degrees))
             brick_arr.append(brick)
     return brick_arr
