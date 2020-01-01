@@ -31,7 +31,6 @@ def threshold_frame(img_frame, min_threshold):
 
 
 '''
-https://docs.opencv.org/master/d4/d13/tutorial_py_filtering.html
 https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#ga9d7064d478c95d60003cf839430737ed
 '''
 def remove_noise(img_frame):
