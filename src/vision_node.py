@@ -15,11 +15,11 @@ class VisionNode():
     def onTimer(self, event):
         ret, frame = vision.get_video_capture_frame('http://192.168.1.103/image.jpg')
         if ret:
-            cropped_frame = frame[75:frame.shape[0]-140, 35:frame.shape[1]-5]
-            data = BrickArray()     
+            cropped_frame = frame[75:frame.shape[0]-120, 35:frame.shape[1]-5]
             blue_contours = vision.filter_blue_bricks(cropped_frame)
             red_contours = vision.filter_red_bricks(cropped_frame)
 
+            data = BrickArray()     
             if((self.isCalibrated is False)):
                 ref_pixel_width = vision.init_get_ref_pixel_width(cropped_frame)
                 rospy.set_param('ref_pixel_width', ref_pixel_width)
@@ -50,9 +50,6 @@ class VisionNode():
             
             msg = data
             self.publisher.publish(msg)
-        
-
-
         
 
 if __name__ == '__main__':

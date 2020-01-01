@@ -64,7 +64,7 @@ def blue_color_mask(img_frame):
 def red_color_mask(img_frame):
     result = img_frame
     result = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
-    lower_red = np.array([145,145,0])
+    lower_red = np.array([140,130,0])
     upper_red = np.array([255,255,255])
     result = cv2.inRange(result, lower_red, upper_red)
 
